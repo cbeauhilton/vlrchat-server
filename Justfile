@@ -38,10 +38,10 @@ generate-secrets:
     #!/usr/bin/env bash
     mkdir -p secrets
     if [ ! -f secrets/pg_pass ]; then
-        openssl rand -base64 32 > secrets/pg_pass
+        nix-shell -p openssl --run "openssl rand -base64 32" > secrets/pg_pass
     fi
     if [ ! -f secrets/authentik_secret ]; then
-        openssl rand -base64 32 > secrets/authentik_secret
+        nix-shell -p openssl --run "openssl rand -base64 32" > secrets/authentik_secret
     fi
     echo "✅ Secrets generated in ./secrets/"
 
