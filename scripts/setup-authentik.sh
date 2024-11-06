@@ -9,8 +9,8 @@ fi
 
 HOST="$1"
 
-# Generate a new secret key
-SECRET_KEY=$(openssl rand -base64 32)
+# Use nix-shell to ensure openssl is available
+SECRET_KEY=$(nix-shell -p openssl --run "openssl rand -base64 32")
 
 # Create the directory and environment file on the remote host
 ssh -i ~/.ssh/id_ed25519_hetzner_ root@"${HOST}" "mkdir -p /run/secrets/authentik && \
@@ -22,4 +22,4 @@ EOF
     chmod 600 /run/secrets/authentik/authentik-env"
 
 echo "✅ Authentik environment file created at /run/secrets/authentik/authentik-env"
-echo "🔑 Secret key has been set" 
+echo "🔑 Secret key has been set"
