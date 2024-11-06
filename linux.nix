@@ -83,5 +83,10 @@
       options = "--delete-older-than 7d";
     };
   };
+
+  # Add authentik module to imports
+  imports = [
+    ./authentik.nix
+  ];
 }
 

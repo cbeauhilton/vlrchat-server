@@ -17,6 +17,9 @@
 
   inputs.jeezyvim.url = "github:LGUG2Z/JeezyVim";
 
+  inputs.authentik-nix.url = "github:nix-community/authentik-nix";
+  inputs.authentik-nix.inputs.nixpkgs.follows = "nixpkgs";
+
   outputs = inputs:
     with inputs; let
       secrets = builtins.fromJSON (builtins.readFile "${self}/secrets.json");

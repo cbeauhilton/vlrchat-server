@@ -28,6 +28,22 @@ trust-host host=default_host:
     ssh-keygen -R {{host}}
     ssh-keyscan -H {{host}} >> ~/.ssh/known_hosts
 
+# Generate and set up authentik environment file on the host
+setup-authentik host=default_host:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    
+    # Generate a new secret key
+    SECRET_KEY=$(openssl rand -base64 32)
+    
+    # Create the directory and environment file on the remote host
+    ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "mkdir -p /run/secrets/authentik && \
+        echo 'AUTHENTIK_SECRET_KEY=${SECRET_KEY}' > /run/secrets/authentik/authentik-env && \
+        chmod 600 /run/secrets/authentik/authentik-env"
+    
+    echo "✅ Authentik environment file created at /run/secrets/authentik/authentik-env"
+    echo "🔑 Secret key has been set"
+
 # Default recipes at the top
 default:
     @just --list
