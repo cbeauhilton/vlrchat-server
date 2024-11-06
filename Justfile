@@ -93,11 +93,27 @@ check-secrets host=default_host:
         echo 'Authentik secret hash:' && \
         sha256sum /var/lib/authentik/secrets/authentik_secret"
 
+# Generate self-signed certificate for Authentik
+generate-cert host=default_host:
+    #!/usr/bin/env bash
+    echo "🔒 Generating self-signed certificate..."
+    ssh -i {{ssh_key}} root@{{host}} "\
+        mkdir -p /var/lib/authentik/certs && \
+        openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        -keyout /var/lib/authentik/certs/key.pem \
+        -out /var/lib/authentik/certs/cert.pem \
+        -subj '/CN=auth.vlr.chat' && \
+        chown -R authentik:authentik /var/lib/authentik/certs && \
+        chmod 600 /var/lib/authentik/certs/key.pem && \
+        chmod 644 /var/lib/authentik/certs/cert.pem"
+    echo "✅ Certificate generated successfully"
+
 # Setup Authentik (full deployment)
 setup-authentik host=default_host:
     #!/usr/bin/env bash
     set -e
     just generate-secrets
     just deploy-secrets {{host}}
+    just generate-cert {{host}}
     just update {{host}}
     just check-status {{host}}

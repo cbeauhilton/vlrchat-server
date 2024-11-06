@@ -85,29 +85,17 @@
     };
   };
 
-  # HTTPS configuration
-#   security.acme = {
-#     acceptTerms = true;
-#     defaults = {
-#       email = "beau@vlr.chat";
-#       server = "https://acme-staging-v02.api.letsencrypt.org/directory";
-#       webroot = "/var/lib/acme/acme-challenge";
-#       group = "nginx";
-#     };
-#   };
+  # Comment out ACME configuration
+  # security.acme = { ... };
 
   # Nginx reverse proxy
   services.nginx.virtualHosts."auth.vlr.chat" = {
+    # Comment out ACME-related settings
     # enableACME = true;
     forceSSL = true;
-    # # Modify the ACME challenge location
-    # locations."/.well-known/acme-challenge" = {
-    #   root = "/var/lib/acme/acme-challenge";
-    #   extraConfig = ''
-    #     allow all;
-    #     auth_basic off;
-    #   '';
-    # };
+    # Generate a self-signed certificate
+    sslCertificate = "/var/lib/authentik/certs/cert.pem";
+    sslCertificateKey = "/var/lib/authentik/certs/key.pem";
     locations."/" = {
       proxyPass = "http://localhost:9000";
       proxyWebsockets = true;
