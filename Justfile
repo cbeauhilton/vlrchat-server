@@ -75,58 +75,22 @@ deploy-secrets host=default_host:
     just generate-secrets
     
     # Create remote directory
-    ssh -i {{ssh_key}} root@{{host}} "mkdir -p /var/lib/authentik/secrets"
+    ssh -i {{ssh_key}} root@{{host}} "mkdir -p /run/secrets"
     
-    # Copy secrets
-    scp -i {{ssh_key}} secrets/pg_pass secrets/authentik_secret root@{{host}}:/var/lib/authentik/secrets/
+    # Create environment file with secrets
+    ssh -i {{ssh_key}} root@{{host}} "cat > /run/secrets/authentik-env << EOF
+AUTHENTIK_SECRET_KEY=\$(cat secrets/authentik_secret)
+AUTHENTIK_EMAIL__PASSWORD=your_smtp_password
+EOF"
     
-    # Set proper permissions and verify files
-    ssh -i {{ssh_key}} root@{{host}} "\
-        chown -R authentik:authentik /var/lib/authentik/secrets && \
-        chmod -R 600 /var/lib/authentik/secrets/* && \
-        if [ ! -s /var/lib/authentik/secrets/pg_pass ] || [ ! -s /var/lib/authentik/secrets/authentik_secret ]; then \
-            echo '❌ Error: One or more deployed secret files are empty'; \
-            exit 1; \
-        fi"
+    # Set proper permissions
+    ssh -i {{ssh_key}} root@{{host}} "chmod 600 /run/secrets/authentik-env"
     
     echo "✅ Secrets deployed and verified successfully"
 
 # Check container and service status
 check-status host=default_host:
-    chmod +x scripts/check-status.sh
-    ./scripts/check-status.sh {{ssh_key}} {{host}}
-
-# Force rebuild containers
-rebuild-containers host=default_host:
-    ssh -i {{ssh_key}} root@{{host}} "\
-        systemctl stop 'docker-authentik-*'; \
-        docker rm -f authentik-server authentik-worker authentik-postgresql authentik-redis || true; \
-
-# Check secrets are in place
-check-secrets host=default_host:
-    #!/usr/bin/env bash
-    echo "🔍 Checking secrets on {{host}}..."
-    ssh -i {{ssh_key}} root@{{host}} "\
-        ls -la /var/lib/authentik/secrets/ && \
-        echo 'PostgreSQL password hash:' && \
-        sha256sum /var/lib/authentik/secrets/pg_pass && \
-        echo 'Authentik secret hash:' && \
-        sha256sum /var/lib/authentik/secrets/authentik_secret"
-
-# Generate self-signed certificate for Authentik
-generate-cert host=default_host:
-    #!/usr/bin/env bash
-    echo "🔒 Generating self-signed certificate..."
-    ssh -i {{ssh_key}} root@{{host}} "\
-        mkdir -p /var/lib/authentik/certs && \
-        nix-shell -p openssl --run \"openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-        -keyout /var/lib/authentik/certs/key.pem \
-        -out /var/lib/authentik/certs/cert.pem \
-        -subj '/CN=auth.vlr.chat'\" && \
-        chown -R authentik:authentik /var/lib/authentik/certs && \
-        chmod 600 /var/lib/authentik/certs/key.pem && \
-        chmod 644 /var/lib/authentik/certs/cert.pem"
-    echo "✅ Certificate generated successfully"
+    ssh -i {{ssh_key}} root@{{host}} "systemctl status authentik-*"
 
 # Setup Authentik (full deployment)
 setup-authentik host=default_host:
@@ -134,6 +98,5 @@ setup-authentik host=default_host:
     set -e
     just generate-secrets
     just deploy-secrets {{host}}
-    just generate-cert {{host}}
     just update {{host}}
     just check-status {{host}}

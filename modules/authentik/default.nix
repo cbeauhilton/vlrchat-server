@@ -9,15 +9,17 @@ in {
   config = mkIf cfg.enable {
     services.authentik = {
       enable = true;
+      # For testing, we'll create a basic environment file
+      environmentFile = "/run/secrets/authentik-env";
       settings = {
         disable_startup_analytics = true;
         avatars = "initials";
         email = {
-          host = "localhost";
-          port = 25;
-          use_tls = false;
+          host = "smtp.mailgun.org";
+          port = 587;
+          use_tls = true;
           use_ssl = false;
-          from = "authentik@localhost";
+          from = "authentik@yourdomain.com";
         };
       };
     };
@@ -29,5 +31,10 @@ in {
         ensureDBOwnership = true;
       }];
     };
+
+    # Add systemd tmpfile to create the secrets directory
+    systemd.tmpfiles.rules = [
+      "d /run/secrets 0755 root root"
+    ];
   };
 }
