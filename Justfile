@@ -35,35 +35,7 @@ trust-host host=default_host:
 
 # Generate secrets for Authentik
 generate-secrets:
-    #!/usr/bin/env bash
-    set -e
-    echo "🔑 Generating secrets..."
-    mkdir -p secrets
-    
-    # Check if files exist and have content
-    if [ ! -s secrets/pg_pass ]; then
-        echo "PostgreSQL password is empty or missing, generating new one..."
-        nix-shell -p openssl --run "openssl rand -base64 50" > secrets/pg_pass
-        echo "Generated new PostgreSQL password"
-    else
-        echo "Using existing PostgreSQL password"
-    fi
-    
-    if [ ! -s secrets/authentik_secret ]; then
-        echo "Authentik secret is empty or missing, generating new one..."
-        nix-shell -p openssl --run "openssl rand -base64 100" > secrets/authentik_secret
-        echo "Generated new Authentik secret key"
-    else
-        echo "Using existing Authentik secret key"
-    fi
-    
-    # Final verification
-    if [ ! -s secrets/pg_pass ] || [ ! -s secrets/authentik_secret ]; then
-        echo "❌ Error: Failed to generate secrets"
-        exit 1
-    fi
-    
-    echo "✅ Secrets verified in ./secrets/"
+    ./scripts/generate-secrets.sh
 
 # Deploy secrets to the host
 deploy-secrets host=default_host:
@@ -71,15 +43,16 @@ deploy-secrets host=default_host:
     set -e
     echo "📦 Deploying secrets to {{host}}..."
     
-    # Ensure secrets exist and aren't empty
+    # Ensure secrets exist
     just generate-secrets
     
     # Create remote directory
     ssh -i {{ssh_key}} root@{{host}} "mkdir -p /run/secrets"
     
     # Create environment file with secrets
+    secret_key=$(cat secrets/authentik_secret)
     ssh -i {{ssh_key}} root@{{host}} "cat > /run/secrets/authentik-env << EOF
-AUTHENTIK_SECRET_KEY=\$(cat secrets/authentik_secret)
+AUTHENTIK_SECRET_KEY=${secret_key}
 AUTHENTIK_EMAIL__PASSWORD=your_smtp_password
 EOF"
     
@@ -94,8 +67,6 @@ check-status host=default_host:
 
 # Setup Authentik (full deployment)
 setup-authentik host=default_host:
-    #!/usr/bin/env bash
-    set -e
     just generate-secrets
     just deploy-secrets {{host}}
     just update {{host}}
