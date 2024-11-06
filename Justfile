@@ -93,40 +93,8 @@ deploy-secrets host=default_host:
 
 # Check container and service status
 check-status host=default_host:
-    #!/usr/bin/env bash
-    echo "═══════════════════════════════════════════════"
-    ssh -i {{ssh_key}} root@{{host}} "date '+%Y-%m-%d %H:%M:%S %Z'"
-    echo "═══════════════════════════════════════════════"
-    echo "🔍 Checking container status..."
-    
-    # Get container names
-    CONTAINERS=$(ssh -i {{ssh_key}} root@{{host}} "docker ps -a --format '{{.Names}}'")
-    
-    # Show all containers
-    ssh -i {{ssh_key}} root@{{host}} "docker ps -a"
-    echo
-    echo "───────────────────────���───────────────────────"
-    echo "📜 Container logs (last 50 lines for each)..."
-    echo "Timestamp: $(ssh -i {{ssh_key}} root@{{host}} 'date "+%Y-%m-%d %H:%M:%S %Z"')"
-    
-    # Show logs for each container
-    for container in $CONTAINERS; do
-        echo
-        echo "📄 Logs for ${container}:"
-        echo "───────────────────────────────────────────────"
-        ssh -i {{ssh_key}} root@{{host}} "docker logs ${container} 2>&1 | tail -n 50"
-    done
-    echo
-    echo "───────────────────────────────────────────────"
-    echo "🔄 Service status..."
-    echo "Timestamp: $(ssh -i {{ssh_key}} root@{{host}} 'date "+%Y-%m-%d %H:%M:%S %Z"')"
-    
-    # Check status for each container's service
-    for container in $CONTAINERS; do
-        ssh -i {{ssh_key}} root@{{host}} "systemctl status docker-${container}"
-    done
-    ssh -i {{ssh_key}} root@{{host}} "systemctl status nginx"
-    echo "═══════════════════════════════════════════════"
+    chmod +x scripts/check-status.sh
+    ./scripts/check-status.sh {{ssh_key}} {{host}}
 
 # Force rebuild containers
 rebuild-containers host=default_host:
