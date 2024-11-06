@@ -19,7 +19,7 @@ deploy-verbose host=default_host:
 
 # Update existing NixOS installation
 update host=default_host:
-    NIX_SSHOPTS="-i ~/.ssh/id_ed25519_hetzner_" \
+    NIX_SSHOPTS="-i {{ssh_key}}" \
     nixos-rebuild switch \
         --flake .#nixos \
         --target-host root@{{host}}
@@ -38,15 +38,15 @@ setup-authentik host=default_host:
 check-authentik host=default_host:
     #!/usr/bin/env bash
     echo "🔍 Checking container status..."
-    ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "docker ps -a | grep authentik"
+    ssh -i {{ssh_key}} root@{{host}} "docker ps -a | grep authentik"
     echo "📜 Container logs..."
-    ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "docker logs authentik 2>&1 | tail -n 50"
+    ssh -i {{ssh_key}} root@{{host}} "docker logs authentik 2>&1 | tail -n 50"
     echo "🔄 Service status..."
-    ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "systemctl status docker-authentik postgresql redis-authentik nginx"
+    ssh -i {{ssh_key}} root@{{host}} "systemctl status docker-authentik postgresql redis-authentik nginx"
 
 # Force rebuild containers
 rebuild-containers host=default_host:
-    ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "\
+    ssh -i {{ssh_key}} root@{{host}} "\
         systemctl stop docker-authentik; \
         docker rm -f authentik || true; \
         systemctl start docker-authentik"
