@@ -88,7 +88,10 @@
   # HTTPS configuration
   security.acme = {
     acceptTerms = true;
-    defaults.email = "beau@vlr.chat";
+    defaults = {
+      email = "beau@vlr.chat";
+      server = "https://acme-staging-v02.api.letsencrypt.org/directory";
+    };
   };
 
   # Nginx reverse proxy

@@ -97,6 +97,7 @@ check-secrets host=default_host:
 setup-authentik host=default_host:
     #!/usr/bin/env bash
     set -e
+    just generate-secrets
     just deploy-secrets {{host}}
     just update {{host}}
     just check-status {{host}}
