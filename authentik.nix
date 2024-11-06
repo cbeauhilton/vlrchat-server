@@ -9,6 +9,10 @@
   services.postgresql = {
     enable = true;
     ensureDatabases = [ "authentik" ];
+    ensureUsers = [{
+      name = "authentik";
+      ensureDBOwnership = true;
+    }];
     authentication = pkgs.lib.mkOverride 10 ''
       # TYPE  DATABASE   USER        METHOD
       local   all        all         trust
@@ -27,7 +31,7 @@
     environmentFiles = [ "/run/secrets/authentik/authentik-env" ];
     
     environment = {
-      AUTHENTIK_POSTGRESQL__HOST = "/var/run/postgresql"; # Path to Unix socket
+      AUTHENTIK_POSTGRESQL__HOST = "/var/run/postgresql";
       AUTHENTIK_POSTGRESQL__USER = "authentik";
       AUTHENTIK_POSTGRESQL__NAME = "authentik";
       AUTHENTIK_REDIS__HOST = "localhost";
@@ -45,7 +49,7 @@
       "/var/run/postgresql:/var/run/postgresql" # Mount PostgreSQL socket directory
     ];
 
-    dependsOn = [ "postgresql" "redis-authentik" ];
+    dependsOn = [ "postgresql.service" "redis-authentik.service" ];
   };
 
   # Enable nginx and ACME for Let's Encrypt
