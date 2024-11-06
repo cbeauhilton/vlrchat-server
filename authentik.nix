@@ -26,8 +26,17 @@
     port = 6379;
     bind = "127.0.0.1";
     unixSocket = "/run/redis-authentik/redis.sock";
-    user = "authentik";
+    settings = {
+      supervised = "systemd";
+    };
   };
+
+  # Add tmpfiles rules for Redis socket directory
+  systemd.tmpfiles.rules = [
+    "d /var/lib/authentik/data 0750 authentik authentik -"
+    "d /var/lib/authentik/media 0750 authentik authentik -"
+    "d /run/redis-authentik 0750 authentik authentik -"
+  ];
 
   virtualisation.oci-containers.containers.authentik = {
     image = "ghcr.io/goauthentik/server:latest";
@@ -76,4 +85,13 @@
       proxyWebsockets = true;
     };
   };
+
+  # Add system user for authentik
+  users.users.authentik = {
+    isSystemUser = true;
+    group = "authentik";
+    home = "/var/lib/authentik";
+  };
+
+  users.groups.authentik = {};
 } 
