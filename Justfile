@@ -39,25 +39,30 @@ generate-secrets:
     set -e
     echo "🔑 Generating secrets..."
     mkdir -p secrets
-    if [ ! -f secrets/pg_pass ]; then
-        # Generate a longer password (50 chars) for PostgreSQL
+    
+    # Check if files exist and have content
+    if [ ! -s secrets/pg_pass ]; then
+        echo "PostgreSQL password is empty or missing, generating new one..."
         nix-shell -p openssl --run "openssl rand -base64 50" > secrets/pg_pass
         echo "Generated new PostgreSQL password"
     else
         echo "Using existing PostgreSQL password"
     fi
-    if [ ! -f secrets/authentik_secret ]; then
-        # Generate a longer key (100 chars) for Django's SECRET_KEY
+    
+    if [ ! -s secrets/authentik_secret ]; then
+        echo "Authentik secret is empty or missing, generating new one..."
         nix-shell -p openssl --run "openssl rand -base64 100" > secrets/authentik_secret
         echo "Generated new Authentik secret key"
     else
         echo "Using existing Authentik secret key"
     fi
-    # Ensure files aren't empty
+    
+    # Final verification
     if [ ! -s secrets/pg_pass ] || [ ! -s secrets/authentik_secret ]; then
-        echo "❌ Error: One or more secret files are empty"
+        echo "❌ Error: Failed to generate secrets"
         exit 1
     fi
+    
     echo "✅ Secrets verified in ./secrets/"
 
 # Deploy secrets to the host
