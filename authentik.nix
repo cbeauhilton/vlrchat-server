@@ -30,9 +30,30 @@
       };
       disable_startup_analytics = true;
       disable_update_check = true;
-      error_reporting = {
-        enabled = false;
-      };
+      error_reporting.enabled = false;
     };
+
+    # Add environment configuration
+    environmentFile = "/var/lib/authentik/authentik.env";
+  };
+
+  # Create basic environment file
+  systemd.tmpfiles.rules = [
+    "d /var/lib/authentik 0750 authentik authentik -"
+    "f /var/lib/authentik/authentik.env 0640 authentik authentik - AUTHENTIK_SECRET_KEY=yoursecretkeyhere\nAUTHENTIK_POSTGRESQL__HOST=localhost\nAUTHENTIK_POSTGRESQL__USER=authentik\nAUTHENTIK_POSTGRESQL__NAME=authentik\nAUTHENTIK_POSTGRESQL__PASSWORD=authentik"
+  ];
+
+  # Enable and configure PostgreSQL
+  services.postgresql = {
+    enable = true;
+    ensureDatabases = [ "authentik" ];
+    ensureUsers = [
+      {
+        name = "authentik";
+        ensurePermissions = {
+          "DATABASE authentik" = "ALL PRIVILEGES";
+        };
+      }
+    ];
   };
 } 
