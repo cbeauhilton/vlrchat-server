@@ -41,6 +41,9 @@
         volumes = [
           "authentik-redis:/data"
         ];
+        extraOptions = [
+          "--network=host"
+        ];
       };
 
       authentik-server = {
