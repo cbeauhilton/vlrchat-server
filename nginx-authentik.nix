@@ -13,17 +13,16 @@
       enableACME = false;
       forceSSL = false;
       
-      # Serve a static HTML page
-      root = "/var/lib/authentik/static";
-      locations."/" = {
-        index = "index.html";
+      locations = {
+        "/" = {
+          proxyPass = "http://localhost:9000";
+          proxyWebsockets = true;
+        };
+        "/ws" = {
+          proxyPass = "http://localhost:9000";
+          proxyWebsockets = true;
+        };
       };
     };
   };
-
-  # Create the static directory and HTML file
-  systemd.tmpfiles.rules = [
-    "d /var/lib/authentik/static 0755 authentik authentik -"
-    "f /var/lib/authentik/static/index.html 0644 authentik authentik - <!DOCTYPE html><html><head><title>Auth Test Page</title></head><body><h1>Auth Test Page</h1><p>If you can see this, nginx is working correctly!</p></body></html>"
-  ];
 }
