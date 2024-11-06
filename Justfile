@@ -39,27 +39,7 @@ generate-secrets:
 
 # Deploy secrets to the host
 deploy-secrets host=default_host:
-    #!/usr/bin/env bash
-    set -e
-    echo "📦 Deploying secrets to {{host}}..."
-    
-    # Ensure secrets exist
-    just generate-secrets
-    
-    # Create remote directory
-    ssh -i {{ssh_key}} root@{{host}} 'mkdir -p /run/secrets'
-    
-    # Create environment file with secrets
-    secret_key=$(cat secrets/authentik_secret)
-    ssh -i {{ssh_key}} root@{{host}} 'cat > /run/secrets/authentik-env' << EOF
-AUTHENTIK_SECRET_KEY=${secret_key}
-AUTHENTIK_EMAIL__PASSWORD=your_smtp_password
-EOF
-    
-    # Set proper permissions
-    ssh -i {{ssh_key}} root@{{host}} 'chmod 600 /run/secrets/authentik-env'
-    
-    echo "✅ Secrets deployed and verified successfully"
+    ./scripts/deploy-secrets.sh {{host}} {{ssh_key}}
 
 # Check container and service status
 check-status host=default_host:
