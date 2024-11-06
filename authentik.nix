@@ -11,11 +11,16 @@
     ensureDatabases = [ "authentik" ];
     ensureUsers = [{
       name = "authentik";
-      ensurePermissions = {
-        "DATABASE authentik" = "ALL PRIVILEGES";
+      ensureClauses = {
+        login = true;
       };
     }];
   };
+
+  # Add this after PostgreSQL configuration to grant privileges
+  systemd.services.postgresql.postStart = lib.mkAfter ''
+    $PSQL -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE authentik TO authentik;"
+  '';
 
   # Configure Redis for Authentik
   services.redis.servers."authentik" = {
