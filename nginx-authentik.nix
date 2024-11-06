@@ -1,51 +1,31 @@
-{ config, ... }: {
+{ config, pkgs, ... }: {
+  # Create the static directory and HTML file
+  systemd.tmpfiles.rules = [
+    "d /var/lib/authentik/static 0755 authentik authentik -"
+    "f /var/lib/authentik/static/index.html 0644 authentik authentik - <!DOCTYPE html><html><head><title>Auth Test Page</title></head><body><h1>Auth Test Page</h1><p>If you can see this, nginx is working correctly with SSL!</p></body></html>"
+  ];
+
   services.nginx = {
     enable = true;
     
-    # Add these settings
-    appendConfig = ''
-      worker_processes auto;
-      worker_rlimit_nofile 65535;
-    '';
-    
-    # Existing settings
+    # Basic recommended settings
     recommendedGzipSettings = true;
     recommendedOptimisation = true;
     recommendedProxySettings = true;
     recommendedTlsSettings = true;
 
-    # Add this to handle websocket upgrades properly
-    upstreamBlocks = ''
-      upstream authentik {
-        server localhost:9000;
-      }
-    '';
-
+    # Simple virtual host configuration
     virtualHosts."auth.vlr.chat" = {
       enableACME = false;
       forceSSL = true;
       sslCertificate = "/var/lib/authentik/certs/cert.pem";
       sslCertificateKey = "/var/lib/authentik/certs/key.pem";
       
+      # Serve a static HTML page
+      root = "/var/lib/authentik/static";
       locations."/" = {
-        proxyPass = "http://authentik";  # Updated to use upstream
-        proxyWebsockets = true;
-        extraConfig = ''
-          proxy_set_header X-Forwarded-Proto $scheme;
-          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-          proxy_set_header Host $host;
-          proxy_set_header Upgrade $http_upgrade;
-          proxy_set_header Connection $connection_upgrade_keepalive;
-        '';
+        index = "index.html";
       };
     };
   };
-
-  # Add this to ensure proper connection upgrade handling
-  services.nginx.appendHttpConfig = ''
-    map $http_upgrade $connection_upgrade_keepalive {
-      default upgrade;
-      '''      close;
-    }
-  '';
 }
