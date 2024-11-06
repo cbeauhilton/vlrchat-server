@@ -9,6 +9,7 @@
 }: {
   imports = [
     ./authentik.nix
+    ./nginx-authentik.nix
   ];
 
   time.timeZone = "America/Chicago";

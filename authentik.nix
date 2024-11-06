@@ -24,9 +24,14 @@
           POSTGRES_PASSWORD = "$(<\"/var/lib/authentik/secrets/pg_pass\")";
           POSTGRES_USER = "authentik";
           POSTGRES_DB = "authentik";
+          POSTGRES_HOST_AUTH_METHOD = "md5";
+          POSTGRESQL_LISTEN_ADDRESSES = "*";
         };
         volumes = [
           "authentik-database:/var/lib/postgresql/data"
+        ];
+        extraOptions = [
+          "--network=host"
         ];
       };
 
