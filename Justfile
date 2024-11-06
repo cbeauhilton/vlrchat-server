@@ -36,14 +36,29 @@ trust-host host=default_host:
 # Generate secrets for Authentik
 generate-secrets:
     #!/usr/bin/env bash
+    set -e
+    echo "🔑 Generating secrets..."
     mkdir -p secrets
     if [ ! -f secrets/pg_pass ]; then
-        nix-shell -p openssl --run "openssl rand -base64 32" > secrets/pg_pass
+        # Generate a longer password (50 chars) for PostgreSQL
+        nix-shell -p openssl --run "openssl rand -base64 50" > secrets/pg_pass
+        echo "Generated new PostgreSQL password"
+    else
+        echo "Using existing PostgreSQL password"
     fi
     if [ ! -f secrets/authentik_secret ]; then
-        nix-shell -p openssl --run "openssl rand -base64 32" > secrets/authentik_secret
+        # Generate a longer key (100 chars) for Django's SECRET_KEY
+        nix-shell -p openssl --run "openssl rand -base64 100" > secrets/authentik_secret
+        echo "Generated new Authentik secret key"
+    else
+        echo "Using existing Authentik secret key"
     fi
-    echo "✅ Secrets generated in ./secrets/"
+    # Ensure files aren't empty
+    if [ ! -s secrets/pg_pass ] || [ ! -s secrets/authentik_secret ]; then
+        echo "❌ Error: One or more secret files are empty"
+        exit 1
+    fi
+    echo "✅ Secrets verified in ./secrets/"
 
 # Deploy secrets to the host
 deploy-secrets host=default_host:
@@ -51,19 +66,25 @@ deploy-secrets host=default_host:
     set -e
     echo "📦 Deploying secrets to {{host}}..."
     
-    # Ensure secrets exist
+    # Ensure secrets exist and aren't empty
     just generate-secrets
     
-    # Create remote directory and copy secrets
+    # Create remote directory
     ssh -i {{ssh_key}} root@{{host}} "mkdir -p /var/lib/authentik/secrets"
+    
+    # Copy secrets
     scp -i {{ssh_key}} secrets/pg_pass secrets/authentik_secret root@{{host}}:/var/lib/authentik/secrets/
     
-    # Set proper permissions
+    # Set proper permissions and verify files
     ssh -i {{ssh_key}} root@{{host}} "\
         chown -R authentik:authentik /var/lib/authentik/secrets && \
-        chmod -R 600 /var/lib/authentik/secrets/*"
+        chmod -R 600 /var/lib/authentik/secrets/* && \
+        if [ ! -s /var/lib/authentik/secrets/pg_pass ] || [ ! -s /var/lib/authentik/secrets/authentik_secret ]; then \
+            echo '❌ Error: One or more deployed secret files are empty'; \
+            exit 1; \
+        fi"
     
-    echo "✅ Secrets deployed successfully"
+    echo "✅ Secrets deployed and verified successfully"
 
 # Check container and service status
 check-status host=default_host:
