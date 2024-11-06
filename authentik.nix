@@ -1,11 +1,5 @@
 { config, lib, pkgs, ... }: {
-  # Create required directories for authentik
-  systemd.tmpfiles.rules = [
-    "d /var/lib/authentik/data 0750 root root -"
-    "d /var/lib/authentik/media 0750 root root -"
-  ];
-
-  # Configure PostgreSQL
+  # Configure PostgreSQL for authentik
   services.postgresql = {
     enable = true;
     ensureDatabases = [ "authentik" ];
