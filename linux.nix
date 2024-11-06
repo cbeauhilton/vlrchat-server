@@ -100,4 +100,6 @@
     enable = true;
     allowedTCPPorts = [ 80 443 ];
   };
+
+  services.vlr.postgresql.enable = true;
 }
