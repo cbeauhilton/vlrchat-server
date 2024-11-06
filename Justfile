@@ -33,6 +33,23 @@ setup-authentik host=default_host:
     chmod +x scripts/setup-authentik.sh
     ./scripts/setup-authentik.sh {{host}}
 
+# Check container and service status
+check-authentik host=default_host:
+    #!/usr/bin/env bash
+    echo "🔍 Checking container status..."
+    ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "docker ps -a | grep authentik"
+    echo "\n📜 Container logs..."
+    ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "docker logs authentik 2>&1 | tail -n 50"
+    echo "\n🔄 Service status..."
+    ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "systemctl status docker-authentik postgresql redis-authentik nginx"
+
+# Force rebuild containers
+rebuild-containers host=default_host:
+    ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "\
+        systemctl stop docker-authentik; \
+        docker rm -f authentik || true; \
+        systemctl start docker-authentik"
+
 # Default recipes at the top
 default:
     @just --list

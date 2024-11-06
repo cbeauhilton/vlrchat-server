@@ -27,6 +27,7 @@
   virtualisation.oci-containers.containers.authentik = {
     image = "ghcr.io/goauthentik/server:latest";
     environmentFiles = [ "/run/secrets/authentik/authentik-env" ];
+    forceRestart = true;
     
     # Add environment variables for PostgreSQL and Redis connection
     environment = {
