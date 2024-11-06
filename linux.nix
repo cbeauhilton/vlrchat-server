@@ -44,10 +44,15 @@
 
   system.stateVersion = "22.05";
 
-  virtualisation.docker = {
-    enable = true;
-    enableOnBoot = true;
-    autoPrune.enable = true;
+  virtualisation = {
+    docker = {
+      enable = true;
+      enableOnBoot = true;
+      autoPrune.enable = true;
+    };
+    oci-containers = {
+      backend = "docker";  # or "podman" if you prefer
+    };
   };
 
   nix = {
