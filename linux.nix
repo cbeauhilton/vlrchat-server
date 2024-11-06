@@ -7,6 +7,10 @@
   inputs,
   ...
 }: {
+  imports = [
+    ./authentik.nix
+  ];
+
   time.timeZone = "America/Chicago";
 
   systemd.tmpfiles.rules = [
@@ -44,10 +48,15 @@
 
   system.stateVersion = "22.05";
 
-  virtualisation.docker = {
-    enable = true;
-    enableOnBoot = true;
-    autoPrune.enable = true;
+  virtualisation = {
+    docker = {
+      enable = true;
+      enableOnBoot = true;
+      autoPrune.enable = true;
+    };
+    oci-containers = {
+      backend = "docker";  # Add this to explicitly set the backend
+    };
   };
 
   nix = {

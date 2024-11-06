@@ -38,9 +38,9 @@ check-authentik host=default_host:
     #!/usr/bin/env bash
     echo "🔍 Checking container status..."
     ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "docker ps -a | grep authentik"
-    echo "\n📜 Container logs..."
+    echo "📜 Container logs..."
     ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "docker logs authentik 2>&1 | tail -n 50"
-    echo "\n🔄 Service status..."
+    echo "🔄 Service status..."
     ssh -i ~/.ssh/id_ed25519_hetzner_ root@{{host}} "systemctl status docker-authentik postgresql redis-authentik nginx"
 
 # Force rebuild containers
