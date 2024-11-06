@@ -99,7 +99,7 @@ check-status host=default_host:
     echo "📜 Container logs..."
     ssh -i {{ssh_key}} root@{{host}} "docker logs authentik-server 2>&1 | tail -n 50"
     echo "🔄 Service status..."
-    ssh -i {{ssh_key}} root@{{host}} "systemctl status docker-authentik-server docker-authentik-worker docker-authentik-postgresql docker-authentik-redis nginx"
+    ssh -i {{ssh_key}} root@{{host}} "systemctl status authentik-server authentik-worker authentik-postgresql authentik-redis nginx"
 
 # Force rebuild containers
 rebuild-containers host=default_host:
