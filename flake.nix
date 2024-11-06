@@ -87,6 +87,7 @@
         username = "beau";
         modules = [
           disko.nixosModules.disko
+          authentik-nix.nixosModules.default
           ./hetzner.nix
           ./linux.nix
         ];
