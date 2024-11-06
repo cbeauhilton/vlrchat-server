@@ -1,17 +1,18 @@
 # Default host IP for deployment
 default_host := "178.156.144.225"
+ssh_key := "~/.ssh/id_ed25519_hetzner_"
 
 # Deploy fresh NixOS installation to a remote host (default or specified)
 deploy host=default_host:
     nix run github:numtide/nixos-anywhere -- \
-        -i ~/.ssh/id_ed25519_hetzner_ \
+        -i {{ssh_key}} \
         --flake .#nixos \
         root@{{host}}
 
 # Deploy with full build logs
 deploy-verbose host=default_host:
     nix run github:numtide/nixos-anywhere -- \
-        -i ~/.ssh/id_ed25519_hetzner_ \
+        -i {{ssh_key}} \
         -L \
         --flake .#nixos \
         root@{{host}}
