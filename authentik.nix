@@ -14,8 +14,9 @@
       ensureDBOwnership = true;
     }];
     authentication = pkgs.lib.mkOverride 10 ''
-      # TYPE  DATABASE   USER        METHOD
-      local   all        all         trust
+      # TYPE  DATABASE        USER            ADDRESS         METHOD
+      local   authentik       authentik                       trust
+      local   all            all                             peer
     '';
   };
 
@@ -24,6 +25,8 @@
     enable = true;
     port = 6379;
     bind = "127.0.0.1";
+    unixSocket = "/run/redis-authentik/redis.sock";
+    user = "authentik";
   };
 
   virtualisation.oci-containers.containers.authentik = {
@@ -34,7 +37,7 @@
       AUTHENTIK_POSTGRESQL__HOST = "/var/run/postgresql";
       AUTHENTIK_POSTGRESQL__USER = "authentik";
       AUTHENTIK_POSTGRESQL__NAME = "authentik";
-      AUTHENTIK_REDIS__HOST = "localhost";
+      AUTHENTIK_REDIS__HOST = "127.0.0.1";
       AUTHENTIK_REDIS__PORT = "6379";
     };
     
@@ -50,6 +53,12 @@
     ];
 
     dependsOn = [ "postgresql.service" "redis-authentik.service" ];
+
+    user = "999:999";
+
+    extraOptions = [
+      "--network=host"
+    ];
   };
 
   # Enable nginx and ACME for Let's Encrypt
