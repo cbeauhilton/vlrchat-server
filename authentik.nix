@@ -1,35 +1,54 @@
 { config, lib, pkgs, ... }:
-with lib; {
-  imports = [ ./postgresql.nix ];
-
-  # System user and group
-  users.users.authentik = {
-    isSystemUser = true;
-    group = "authentik";
-    home = "/var/lib/authentik";
+with lib; let
+  cfg = config.services.vlr.authentik;
+in {
+  options.services.vlr.authentik = {
+    enable = mkEnableOption "Enable authentik auth service";
   };
-  users.groups.authentik = {};
 
-  services.authentik = {
-    enable = true;
-    settings = {
-      disable_startup_analytics = true;
-      avatars = "initials";
-      email = {
-        host = "localhost";
-        port = 25;
-        use_tls = false;
-        use_ssl = false;
-        from = "authentik@localhost";
+  config = mkIf cfg.enable {
+    # Create system user
+    users.users.authentik = {
+      isSystemUser = true;
+      group = "authentik";
+      home = "/var/lib/authentik";
+    };
+    users.groups.authentik = {};
+
+    # Configure Authentik service
+    services = {
+      authentik = {
+        enable = true;
+        # Basic settings that don't need to be secret
+        settings = {
+          disable_startup_analytics = true;
+          avatars = "initials";
+          email = {
+            host = "localhost";
+            port = 25;
+            use_tls = false;
+            use_ssl = false;
+            from = "authentik@localhost";
+          };
+        };
+      };
+
+      # Ensure PostgreSQL has the database and user
+      postgresql = {
+        ensureDatabases = ["authentik"];
+        ensureUsers = [{
+          name = "authentik";
+          ensureDBOwnership = true;
+        }];
+      };
+
+      # Basic nginx configuration
+      nginx.virtualHosts."auth.vlr.chat" = {
+        locations."/" = {
+          proxyPass = "http://localhost:9000";
+          proxyWebsockets = true;
+        };
       };
     };
-    # For development, we'll create a basic environment file
-    environmentFile = "/var/lib/authentik/authentik.env";
   };
-
-  # Create the environment file with basic settings
-  systemd.tmpfiles.rules = [
-    "d /var/lib/authentik 0750 authentik authentik -"
-    "f /var/lib/authentik/authentik.env 0640 authentik authentik - AUTHENTIK_SECRET_KEY=development_secret_key\nAUTHENTIK_POSTGRESQL__HOST=localhost\nAUTHENTIK_POSTGRESQL__USER=authentik\nAUTHENTIK_POSTGRESQL__NAME=authentik\nAUTHENTIK_POSTGRESQL__PASSWORD=authentik"
-  ];
 } 
