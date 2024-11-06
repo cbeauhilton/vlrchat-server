@@ -9,18 +9,11 @@
   services.postgresql = {
     enable = true;
     ensureDatabases = [ "authentik" ];
-    ensureUsers = [{
-      name = "authentik";
-      ensureClauses = {
-        login = true;
-      };
-    }];
+    authentication = pkgs.lib.mkOverride 10 ''
+      # TYPE  DATABASE   USER        METHOD
+      local   all        all         trust
+    '';
   };
-
-  # Add this after PostgreSQL configuration to grant privileges
-  systemd.services.postgresql.postStart = lib.mkAfter ''
-    $PSQL -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE authentik TO authentik;"
-  '';
 
   # Configure Redis for Authentik
   services.redis.servers."authentik" = {
@@ -33,9 +26,8 @@
     image = "ghcr.io/goauthentik/server:latest";
     environmentFiles = [ "/run/secrets/authentik/authentik-env" ];
     
-    # Add environment variables for PostgreSQL and Redis connection
     environment = {
-      AUTHENTIK_POSTGRESQL__HOST = "/run/postgresql"; # Unix socket
+      AUTHENTIK_POSTGRESQL__HOST = "/var/run/postgresql"; # Path to Unix socket
       AUTHENTIK_POSTGRESQL__USER = "authentik";
       AUTHENTIK_POSTGRESQL__NAME = "authentik";
       AUTHENTIK_REDIS__HOST = "localhost";
@@ -50,10 +42,9 @@
     volumes = [
       "/var/lib/authentik/data:/data"
       "/var/lib/authentik/media:/media"
-      "/run/postgresql:/run/postgresql" # Add PostgreSQL socket
+      "/var/run/postgresql:/var/run/postgresql" # Mount PostgreSQL socket directory
     ];
 
-    # Ensure PostgreSQL and Redis are ready before starting Authentik
     dependsOn = [ "postgresql" "redis-authentik" ];
   };
 
