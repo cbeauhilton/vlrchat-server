@@ -94,4 +94,10 @@
       options = "--delete-older-than 7d";
     };
   };
+
+  # Add these lines to open HTTP/HTTPS ports
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 80 443 ];
+  };
 }
