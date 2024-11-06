@@ -44,15 +44,10 @@
 
   system.stateVersion = "22.05";
 
-  virtualisation = {
-    docker = {
-      enable = true;
-      enableOnBoot = true;
-      autoPrune.enable = true;
-    };
-    oci-containers = {
-      backend = "docker";  # or "podman" if you prefer
-    };
+  virtualisation.docker = {
+    enable = true;
+    enableOnBoot = true;
+    autoPrune.enable = true;
   };
 
   nix = {
@@ -86,12 +81,6 @@
     gc = {
       automatic = true;
       options = "--delete-older-than 7d";
-    };
-  };
-
-  # Add authentik module to imports
-  imports = [
-    ./authentik.nix
-  ];
+    }
 }
 
