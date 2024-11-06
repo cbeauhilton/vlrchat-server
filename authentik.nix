@@ -1,4 +1,4 @@
-{ config, ... }: {
+{ config, lib, ... }: {
   # Create required directories for authentik
   systemd.tmpfiles.rules = [
     "d /var/lib/authentik/data 0750 root root -"
