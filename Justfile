@@ -99,10 +99,10 @@ generate-cert host=default_host:
     echo "🔒 Generating self-signed certificate..."
     ssh -i {{ssh_key}} root@{{host}} "\
         mkdir -p /var/lib/authentik/certs && \
-        openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+        nix-shell -p openssl --run \"openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
         -keyout /var/lib/authentik/certs/key.pem \
         -out /var/lib/authentik/certs/cert.pem \
-        -subj '/CN=auth.vlr.chat' && \
+        -subj '/CN=auth.vlr.chat'\" && \
         chown -R authentik:authentik /var/lib/authentik/certs && \
         chmod 600 /var/lib/authentik/certs/key.pem && \
         chmod 644 /var/lib/authentik/certs/cert.pem"
