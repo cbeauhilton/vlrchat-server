@@ -8,12 +8,13 @@
       ensureDBOwnership = true;
     }];
     settings = {
-      listen_addresses = "localhost";
+      listen_addresses = "127.0.0.1";
     };
     authentication = pkgs.lib.mkOverride 10 ''
       # TYPE  DATABASE        USER            ADDRESS         METHOD
       local   authentik       authentik                       trust
       host    authentik       authentik       127.0.0.1/32   trust
+      host    authentik       authentik       ::1/128        trust
       local   all            all                             peer
     '';
   };
