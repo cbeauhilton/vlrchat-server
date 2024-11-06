@@ -8,7 +8,7 @@
       ensureDBOwnership = true;
     }];
     settings = {
-      listen_addresses = "127.0.0.1";
+      listen_addresses = lib.mkForce "127.0.0.1";
     };
     authentication = pkgs.lib.mkOverride 10 ''
       # TYPE  DATABASE        USER            ADDRESS         METHOD
