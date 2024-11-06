@@ -8,8 +8,8 @@
   ...
 }: {
   imports = [
-    ./authentik.nix
-    ./nginx-authentik.nix
+    ./modules/postgresql
+    ./modules/authentik
   ];
 
   time.timeZone = "America/Chicago";
