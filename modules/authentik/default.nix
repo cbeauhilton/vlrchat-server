@@ -44,15 +44,13 @@ in {
       recommendedOptimisation = true;
       recommendedTlsSettings = true;
 
-      # Basic proxy hash settings
-      appendConfig = ''
-        proxy_headers_hash_max_size 512;
-        proxy_headers_hash_bucket_size 64;
-      '';
-
       virtualHosts = {
         "auth.vlr.chat" = {
           serverName = "auth.vlr.chat";
+          extraConfig = ''
+            proxy_headers_hash_max_size 512;
+            proxy_headers_hash_bucket_size 64;
+          '';
           locations = {
             "/" = {
               proxyPass = "http://127.0.0.1:9000";
