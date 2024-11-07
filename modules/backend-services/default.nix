@@ -11,7 +11,7 @@ with lib; let
       owner = "FlowiseAI";
       repo = "Flowise";
       rev = "2.1.3";
-      sha256 = sha256-3ZqvFmfMZMCEoP7rrtsqWz+s2xKOUTz1SkETlnDuRzk=;  # This will fail and give us the real hash
+      sha256 = "sha256-3ZqvFmfMZMCEoP7rrtsqWz+s2xKOUTz1SkETlnDuRzk=";
     };
 
     npmDepsHash = lib.fakeSha256;  # This will fail and give us the real hash
