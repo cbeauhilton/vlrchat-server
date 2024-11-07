@@ -85,34 +85,6 @@ in {
     # Ensure directories exist
     systemd.tmpfiles.rules = [
       "d /var/lib/traefik 0750 traefik traefik -"
-      "d /etc/traefik/dynamic 0750 traefik traefik -"
     ];
-
-    # Optional: Move dynamic config to a separate file
-    environment.etc."traefik/dynamic/authentik.yml" = {
-      text = builtins.toJSON {
-        http = {
-          routers = {
-            authentik = {
-              rule = "Host(`auth.vlr.chat`)";
-              service = "authentik";
-              entryPoints = ["websecure"];
-              tls = {
-                certResolver = "default";
-              };
-            };
-          };
-          services.authentik.loadBalancer = {
-            servers = [{
-              url = "http://127.0.0.1:9000";
-            }];
-            passHostHeader = true;
-          };
-        };
-      };
-      user = "traefik";
-      group = "traefik";
-      mode = "0640";
-    };
   };
 }
