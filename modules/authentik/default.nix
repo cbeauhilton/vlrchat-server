@@ -44,12 +44,6 @@ in {
       recommendedOptimisation = true;
       recommendedTlsSettings = true;
 
-      # Global logging configuration
-      appendConfig = ''
-        error_log stderr info;
-        access_log stderr;
-      '';
-
       virtualHosts = {
         "auth.vlr.chat" = {
           serverName = "auth.vlr.chat";
