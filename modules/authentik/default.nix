@@ -35,6 +35,7 @@ in {
     # Add systemd tmpfile to create the secrets directory
     systemd.tmpfiles.rules = [
       "d /run/secrets 0755 root root"
+      "d /var/lib/nginx/certs 0750 nginx nginx -"
     ];
 
     services.nginx = {
@@ -47,9 +48,9 @@ in {
           serverName = "auth.vlr.chat";
           forceSSL = true;
           
-          # Self-signed cert configuration
-          sslCertificate = "/run/secrets/nginx-cert.pem";
-          sslCertificateKey = "/run/secrets/nginx-key.pem";
+          # Update certificate paths
+          sslCertificate = "/var/lib/nginx/certs/cert.pem";
+          sslCertificateKey = "/var/lib/nginx/certs/key.pem";
           
           extraConfig = ''
             proxy_headers_hash_max_size 512;
