@@ -6,11 +6,11 @@ with lib; let
   mkServiceConfig = name: {
     enable ? false,
     port ? null,
-    host ? null,
+    host ? "127.0.0.1",
     middlewares ? ["authentik"],
   }: {
     inherit enable port host middlewares;
-    url = "http://${host or "127.0.0.1"}:${toString port}";
+    url = "http://${host}:${toString port}";
     subdomain = "${name}.vlr.chat";
   };
 
