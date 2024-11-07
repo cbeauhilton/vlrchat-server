@@ -54,10 +54,17 @@ in {
 
   options.services.vlr.backend = {
     enable = mkEnableOption "Enable VLR backend services";
-    
-    flowise.enable = mkEnableOption "Enable Flowise AI service";
-    static.enable = mkEnableOption "Enable static service";
-    # Add new service options here
+
+    # Define all service options here
+    flowise = {
+      enable = mkEnableOption "Enable Flowise AI service";
+      # Add any flowise-specific options here
+    };
+
+    static = {
+      enable = mkEnableOption "Enable static service";
+      # Add any static-specific options here
+    };
   };
 
   config = mkIf cfg.enable {

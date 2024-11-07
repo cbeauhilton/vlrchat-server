@@ -29,10 +29,6 @@ with lib; let
   };
 
 in {
-  options.services.vlr.backend.flowise = {
-    enable = mkEnableOption "Enable Flowise AI";
-  };
-
   config = mkIf cfg.enable {
     systemd.services.flowise = {
       description = "Flowise AI";
