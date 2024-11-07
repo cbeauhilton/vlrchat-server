@@ -141,15 +141,14 @@ in {
       "d /var/lib/traefik 0750 traefik traefik -"
     ];
 
-    # Modify the Traefik service to generate certificates before starting
     systemd.services.traefik = {
       serviceConfig = {
         StateDirectory = "traefik";
         ReadWritePaths = [ "/var/lib/traefik" ];
       };
-      preStart = ''
-        ${generateCerts}
-      '';
+      # preStart = ''
+      #   ${generateCerts} # now using real certs
+      # '';
     };
   };
 }

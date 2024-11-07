@@ -23,30 +23,38 @@ in {
   };
 
   config = mkIf cfg.enable {
-    # Create the flowise data directory
-    systemd.tmpfiles.rules = [
-      "d /var/lib/flowise 0750 root root -"
-    ];
-
-    # Flowise container configuration
-    virtualisation.oci-containers.containers = mkIf cfg.flowise.enable {
-      flowise = {
-        image = "flowiseai/flowise:latest";
-        ports = [ "3000:3000" ];
-        environment = {
-        #   FLOWISE_USERNAME = cfg.flowise.credentials.username;
-        #   FLOWISE_PASSWORD = cfg.flowise.credentials.password;
-          PORT = "3000";
-          DISABLE_FLOWISE_TELEMETRY = "true";  # Optional: disable telemetry
-        };
-        volumes = [
-          "/var/lib/flowise:/root/.flowise"
-        ];
-        extraOptions = [
-          "--network=host"
-        ];
+    systemd.services.flowise = mkIf cfg.flowise.enable {
+      description = "Flowise AI";
+      after = [ "network.target" ];
+      wantedBy = [ "multi-user.target" ];
+      environment = {
+        PORT = "3000";
+        HOME = "/var/lib/flowise";
+      };
+      serviceConfig = {
+        Type = "simple";
+        User = "flowise";
+        Group = "flowise";
+        ExecStart = "${pkgs.nodejs_18}/bin/node ${pkgs.nodePackages.flowise}/bin/flowise start";
+        Restart = "always";
+        RestartSec = "10";
+        WorkingDirectory = "/var/lib/flowise";
       };
     };
+
+    # Create flowise user and group
+    users.users.flowise = {
+      isSystemUser = true;
+      group = "flowise";
+      home = "/var/lib/flowise";
+      createHome = true;
+    };
+    users.groups.flowise = {};
+
+    # Create data directory
+    systemd.tmpfiles.rules = [
+      "d /var/lib/flowise 0750 flowise flowise -"
+    ];
 
     # Traefik configuration for all backend services
     services.traefik.dynamicConfigOptions.http = {
@@ -74,3 +82,4 @@ in {
     };
   };
 }
+
