@@ -43,10 +43,6 @@ with lib; let
   '';
 
 in {
-  options.services.vlr.backend.static = {
-    enable = mkEnableOption "Enable static test page";
-  };
-
   config = mkIf cfg.enable {
     systemd.services.vlr-static = {
       description = "VLR Static Site";
