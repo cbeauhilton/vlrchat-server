@@ -1,6 +1,4 @@
 {
-  # FIXME: uncomment the next line if you want to reference your GitHub/GitLab access tokens and other secrets
-  # secrets,
   username,
   hostname,
   pkgs,
@@ -12,6 +10,7 @@
     ./modules/authentik
     ./modules/traefik
     ./modules/backend-services
+    ./select-services.nix
   ];
 
   time.timeZone = "America/Chicago";
@@ -26,7 +25,6 @@
   programs.zsh.enable = true;
   environment.pathsToLink = ["/share/zsh"];
   environment.shells = [pkgs.zsh];
-  # services.nginx.enable = true;
 
   environment.enableAllTerminfo = true;
 
@@ -58,29 +56,17 @@
       enableOnBoot = true;
       autoPrune.enable = true;
     };
-    oci-containers = {
-      backend = "docker";  # Add this to explicitly set the backend
-    };
+    oci-containers.backend = "docker";
   };
 
   nix = {
     settings = {
       trusted-users = [username];
-      # FIXME: use your access tokens from secrets.json here to be able to clone private repos on GitHub and GitLab
-      # access-tokens = [
-      #   "github.com=${secrets.github_token}"
-      #   "gitlab.com=OAuth2:${secrets.gitlab_token}"
-      # ];
-
       accept-flake-config = true;
       auto-optimise-store = true;
     };
 
-    registry = {
-      nixpkgs = {
-        flake = inputs.nixpkgs;
-      };
-    };
+    registry.nixpkgs.flake = inputs.nixpkgs;
 
     nixPath = [
       "nixpkgs=${inputs.nixpkgs.outPath}"
@@ -94,21 +80,6 @@
     gc = {
       automatic = true;
       options = "--delete-older-than 7d";
-    };
-  };
-
-  # Add these lines to open HTTP/HTTPS ports
-  networking.firewall = {
-    enable = true;
-    allowedTCPPorts = [ 80 443 9000 9443 ];
-  };
-
-  services.vlr = {
-    postgresql.enable = true;
-    authentik.enable = true;
-    traefik.enable = true;
-    backend = {
-      enable = true;
     };
   };
 }

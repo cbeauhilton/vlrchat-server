@@ -102,6 +102,8 @@ in {
         StateDirectory = "traefik";
         ReadWritePaths = [ "/var/lib/traefik" ];
       };
+      after = [ "static.service" "flowise.service" ];
+      requires = [ "static.service" ];  # Only if static is always required
     };
   };
 }
