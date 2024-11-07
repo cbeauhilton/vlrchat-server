@@ -1,25 +1,38 @@
 { config, lib, pkgs, ... }:
 with lib; let
   cfg = config.services.vlr.backend;
+  
+  # Create a derivation for Flowise
+  flowise = pkgs.buildNpmPackage {
+    pname = "flowise";
+    version = "2.1.3";  # Update this to the version you want
+    
+    src = pkgs.fetchFromGitHub {
+      owner = "FlowiseAI";
+      repo = "Flowise";
+      rev = "2.1.3";  # Use the same version as above
+      sha256 = "sha256-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";  # You'll need to replace this
+    };
+
+    npmDepsHash = "sha256-YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY";  # You'll need to replace this
+
+    buildInputs = with pkgs; [
+      nodejs_18
+    ];
+
+    makeCacheWritable = true;
+    npmFlags = [ "--legacy-peer-deps" ];
+
+    # Skip some steps that might not be necessary
+    npmInstallFlags = [ "--only=production" ];
+  };
+
 in {
   options.services.vlr.backend = {
     enable = mkEnableOption "Enable VLR backend services";
     flowise = {
       enable = mkEnableOption "Enable Flowise AI";
-    #   credentials = { # using authentik, single flowise user, at least for now
-    #     username = mkOption {
-    #       type = types.str;
-    #       default = "admin";
-    #       description = "Flowise admin username";
-    #     };
-    #     password = mkOption {
-    #       type = types.str;
-    #       default = "changeme123";
-    #       description = "Flowise admin password";
-    #     };
-    #   };
     };
-    # We can add more backend services here later
   };
 
   config = mkIf cfg.enable {
@@ -35,7 +48,7 @@ in {
         Type = "simple";
         User = "flowise";
         Group = "flowise";
-        ExecStart = "${pkgs.nodejs_18}/bin/node ${pkgs.nodePackages.flowise}/bin/flowise start";
+        ExecStart = "${pkgs.nodejs_18}/bin/node ${flowise}/bin/flowise start";
         Restart = "always";
         RestartSec = "10";
         WorkingDirectory = "/var/lib/flowise";
@@ -56,7 +69,7 @@ in {
       "d /var/lib/flowise 0750 flowise flowise -"
     ];
 
-    # Traefik configuration for all backend services
+    # Traefik configuration
     services.traefik.dynamicConfigOptions.http = {
       services = mkMerge [
         (mkIf cfg.flowise.enable {
@@ -64,7 +77,6 @@ in {
             url = "http://localhost:3000";
           }];
         })
-        # Add more services here as needed
       ];
 
       routers = mkMerge [
@@ -77,7 +89,6 @@ in {
             tls.certResolver = "letsencrypt";
           };
         })
-        # Add more routers here as needed
       ];
     };
   };
