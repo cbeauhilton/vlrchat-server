@@ -11,6 +11,7 @@
     ./modules/postgresql
     ./modules/authentik
     ./modules/traefik
+    ./modules/backend-services
   ];
 
   time.timeZone = "America/Chicago";
@@ -106,5 +107,15 @@
     postgresql.enable = true;
     authentik.enable = true;
     traefik.enable = true;
+    backend = {
+      enable = true;
+      flowise = {
+        enable = true;
+        credentials = {
+          username = "changeme";
+          password = "changeme";
+        };
+      };
+    };
   };
 }
