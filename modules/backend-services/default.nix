@@ -5,16 +5,16 @@ with lib; let
   # Create a derivation for Flowise
   flowise = pkgs.buildNpmPackage {
     pname = "flowise";
-    version = "2.1.3";  # Update this to the version you want
+    version = "2.1.3";  # Using a recent version
     
     src = pkgs.fetchFromGitHub {
       owner = "FlowiseAI";
       repo = "Flowise";
-      rev = "2.1.3";  # Use the same version as above
-      sha256 = lib.fakeSha256;  # You'll need to replace this
+      rev = "2.1.3";
+      sha256 = sha256-3ZqvFmfMZMCEoP7rrtsqWz+s2xKOUTz1SkETlnDuRzk=;  # This will fail and give us the real hash
     };
 
-    npmDepsHash = lib.fakeSha256;  # You'll need to replace this
+    npmDepsHash = lib.fakeSha256;  # This will fail and give us the real hash
 
     buildInputs = with pkgs; [
       nodejs_18
@@ -22,8 +22,6 @@ with lib; let
 
     makeCacheWritable = true;
     npmFlags = [ "--legacy-peer-deps" ];
-
-    # Skip some steps that might not be necessary
     npmInstallFlags = [ "--only=production" ];
   };
 
