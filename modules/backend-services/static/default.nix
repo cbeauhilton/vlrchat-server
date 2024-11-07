@@ -55,13 +55,16 @@ in {
       
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${pkgs.python3}/bin/python -m http.server 3001 --directory ${pkgs.runCommand "static-site" {} ''
+        ExecStart = "${pkgs.python3}/bin/python -m http.server 3001 --bind 0.0.0.0 --directory ${pkgs.runCommand "static-site" {} ''
           mkdir -p $out
           cp ${staticHtml} $out/index.html
         ''}";
         Restart = "always";
         RestartSec = "10";
         DynamicUser = true;
+        ProtectSystem = "strict";
+        ProtectHome = true;
+        NoNewPrivileges = true;
       };
     };
   };
