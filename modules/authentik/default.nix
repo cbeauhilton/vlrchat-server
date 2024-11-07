@@ -36,5 +36,31 @@ in {
     systemd.tmpfiles.rules = [
       "d /run/secrets 0755 root root"
     ];
+
+    services.nginx.virtualHosts = {
+      "auth.vlr.chat" = {
+        serverName = "auth.vlr.chat";
+        locations."/" = {
+          proxyPass = "http://localhost:9000";
+          proxyWebsockets = true;
+          extraConfig = ''
+            proxy_http_version 1.1;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header Host $host;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+          '';
+        };
+      };
+      
+      # Add a catch-all for vlr.chat that returns 404
+      "vlr.chat" = {
+        serverName = "vlr.chat";
+        locations."/" = {
+          return = "404";
+        };
+      };
+    };
   };
 }
