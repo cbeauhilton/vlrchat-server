@@ -10,7 +10,7 @@ with lib; let
     src = pkgs.fetchFromGitHub {
       owner = "FlowiseAI";
       repo = "Flowise";
-      rev = "2.1.3";
+      rev = "flowise@2.1.3";
       sha256 = "sha256-3ZqvFmfMZMCEoP7rrtsqWz+s2xKOUTz1SkETlnDuRzk=";
     };
 
