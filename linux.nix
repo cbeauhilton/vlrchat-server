@@ -10,6 +10,7 @@
   imports = [
     ./modules/postgresql
     ./modules/authentik
+    ./modules/traefik
   ];
 
   time.timeZone = "America/Chicago";
@@ -104,5 +105,6 @@
   services.vlr = {
     postgresql.enable = true;
     authentik.enable = true;
+    traefik.enable = true;
   };
 }
