@@ -11,10 +11,10 @@ with lib; let
       owner = "FlowiseAI";
       repo = "Flowise";
       rev = "2.1.3";  # Use the same version as above
-      sha256 = "sha256-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";  # You'll need to replace this
+      sha256 = lib.fakeSha256;  # You'll need to replace this
     };
 
-    npmDepsHash = "sha256-YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY";  # You'll need to replace this
+    npmDepsHash = lib.fakeSha256;  # You'll need to replace this
 
     buildInputs = with pkgs; [
       nodejs_18
