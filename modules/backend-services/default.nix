@@ -14,7 +14,12 @@ with lib; let
       sha256 = "sha256-3ZqvFmfMZMCEoP7rrtsqWz+s2xKOUTz1SkETlnDuRzk=";
     };
 
-    npmDepsHash = "";  # This will fail and give us the real hash
+    # Add this section to generate package-lock.json
+    postPatch = ''
+      npm i --package-lock-only
+    '';
+
+    npmDepsHash = "";  # This will still fail and give us the real hash
 
     buildInputs = with pkgs; [
       nodejs_18
