@@ -40,26 +40,22 @@ in {
     services.nginx = {
       enable = true;
       recommendedProxySettings = true;
-      recommendedGzipSettings = true;
-      recommendedOptimisation = true;
       recommendedTlsSettings = true;
-
-      # Add self-signed cert configuration
-      sslCertificate = "/run/secrets/nginx-cert.pem";
-      sslCertificateKey = "/run/secrets/nginx-key.pem";
 
       virtualHosts = {
         "auth.vlr.chat" = {
           serverName = "auth.vlr.chat";
           forceSSL = true;
-          # Remove enableACME = true;
-          useACMEHost = false;
+          
+          # Self-signed cert configuration
           sslCertificate = "/run/secrets/nginx-cert.pem";
           sslCertificateKey = "/run/secrets/nginx-key.pem";
+          
           extraConfig = ''
             proxy_headers_hash_max_size 512;
             proxy_headers_hash_bucket_size 64;
           '';
+
           locations = {
             "/" = {
               proxyPass = "http://127.0.0.1:9000";
@@ -78,13 +74,6 @@ in {
                 proxy_set_header Connection "upgrade";
               '';
             };
-          };
-        };
-        
-        "vlr.chat" = {
-          serverName = "vlr.chat";
-          locations."/" = {
-            return = "404";
           };
         };
       };

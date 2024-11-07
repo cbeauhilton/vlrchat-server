@@ -7,11 +7,17 @@ ssh_key="$2"
 
 echo "📦 Generating and deploying self-signed certificates..."
 
+# Create secrets directory if it doesn't exist
+mkdir -p secrets
+
 # Generate self-signed certificate
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout secrets/nginx-key.pem \
     -out secrets/nginx-cert.pem \
     -subj "/CN=auth.vlr.chat"
+
+# Create remote directory
+ssh -i "${ssh_key}" "root@${host}" 'mkdir -p /run/secrets'
 
 # Copy certificates to server
 scp -i "${ssh_key}" secrets/nginx-cert.pem "root@${host}:/run/secrets/nginx-cert.pem"

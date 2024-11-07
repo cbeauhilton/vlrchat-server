@@ -54,4 +54,5 @@ setup-authentik host=default_host:
 
 # Deploy self-signed certificates
 deploy-self-signed-certs host=default_host:
+    chmod +x scripts/deploy-self-signed-certs.sh
     ./scripts/deploy-self-signed-certs.sh {{host}} {{ssh_key}}
