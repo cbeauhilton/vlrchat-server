@@ -2,37 +2,6 @@
 with lib; let
   cfg = config.services.vlr.traefik;
   
-  # Script to generate self-signed certificates
-  generateCerts = pkgs.writeShellScript "generate-traefik-certs" ''
-    # Exit on any error
-    set -e
-
-    CERT_DIR="/var/lib/traefik"
-    CERT_FILE="$CERT_DIR/cert.pem"
-    KEY_FILE="$CERT_DIR/key.pem"
-
-    # Only generate if certificates don't exist
-    if [ ! -f "$CERT_FILE" ] || [ ! -f "$KEY_FILE" ]; then
-      echo "Generating self-signed certificates for Traefik..."
-      
-      # Generate self-signed certificate
-      ${pkgs.openssl}/bin/openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-        -keyout "$KEY_FILE" \
-        -out "$CERT_FILE" \
-        -subj "/CN=auth.vlr.chat" \
-        -addext "subjectAltName = DNS:auth.vlr.chat"
-
-      # Set proper permissions
-      chown traefik:traefik "$CERT_FILE" "$KEY_FILE"
-      chmod 644 "$CERT_FILE"
-      chmod 600 "$KEY_FILE"
-      
-      echo "✅ Self-signed certificates generated successfully"
-    else
-      echo "Certificates already exist, skipping generation"
-    fi
-  '';
-
 in {
   options.services.vlr.traefik = {
     enable = mkEnableOption "Enable traefik";
@@ -65,19 +34,6 @@ in {
           storage = "/var/lib/traefik/acme.json";
           httpChallenge.entryPoint = "web";
         };
-
-        # # For development, use static certificates instead of Let's Encrypt
-        # tls = {
-        #   certificates = [{
-        #     certFile = "/var/lib/traefik/cert.pem";
-        #     keyFile = "/var/lib/traefik/key.pem";
-        #   }];
-        #   options = {
-        #     default = {
-        #       insecureSkipVerify = true;  # For development only
-        #     };
-        #   };
-        # };
       };
 
       dynamicConfigOptions = {
@@ -128,7 +84,7 @@ in {
               rule = "Host(`auth.vlr.chat`)";
               service = "authentik";
               tls = {
-                certResolver = "letsencrypt";  # Add this line to use Let's Encrypt
+                certResolver = "letsencrypt";
               };
             };
           };
@@ -146,9 +102,6 @@ in {
         StateDirectory = "traefik";
         ReadWritePaths = [ "/var/lib/traefik" ];
       };
-      # preStart = ''
-      #   ${generateCerts} # now using real certs
-      # '';
     };
   };
 }
