@@ -68,6 +68,9 @@ in {
                 ];
                 authRequestHeaders = {
                   "X-Forwarded-Proto" = "https";
+                  "X-Forwarded-Host" = "true";
+                  "X-Forwarded-Uri" = "true";
+                  "X-Forwarded-For" = "true";
                 };
                 authResponseHeadersRegex = "X-.*";
               };
