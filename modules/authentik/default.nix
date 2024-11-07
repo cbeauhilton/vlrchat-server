@@ -20,6 +20,14 @@ in {
           # use_ssl = false;
           # from = "authentik@yourdomain.com";
         };
+        listen.http = {
+          host = "0.0.0.0";
+          port = 9000;
+        };
+        listen.https = {
+          host = "0.0.0.0";
+          port = 9443;
+        };
       };
     };
 

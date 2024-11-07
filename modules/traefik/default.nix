@@ -76,15 +76,15 @@ in {
       dynamicConfigOptions = {
         http = {
           middlewares = {
-            security-headers = {
-              headers = {
-                stsSeconds = 31536000;
-                stsIncludeSubdomains = true;
-                contentTypeNosniff = true;
-                xFrameOptions = "DENY";
-                referrerPolicy = "strict-origin-when-cross-origin";
-              };
-            };
+            # security-headers = {
+            #   headers = {
+            #     stsSeconds = 31536000;
+            #     stsIncludeSubdomains = true;
+            #     contentTypeNosniff = true;
+            #     xFrameOptions = "DENY";
+            #     referrerPolicy = "strict-origin-when-cross-origin";
+            #   };
+            # };
             authentik = {
               forwardAuth = {
                 address = "https://localhost:9443/outpost.goauthentik.io/auth/traefik";
@@ -107,22 +107,20 @@ in {
             };
           };
           services = {
-            auth = {
+            authentik = {
               loadBalancer = {
                 servers = [{
                   url = "http://localhost:9000";
                 }];
-                passHostHeader = true;
               };
             };
           };
           routers = {
-            auth = {
-              rule = "Host(`auth.vlr.chat`) || PathPrefix(`/outpost.goauthentik.io/`)";
-              service = "auth";
+            authentik = {
               entryPoints = ["websecure"];
-              middlewares = ["security-headers"];
-              tls = {};  # Use static certificates instead of certResolver
+              rule = "Host(`auth.vlr.chat`)";
+              service = "authentik";
+              tls = {};
             };
           };
         };
