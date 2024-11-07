@@ -81,7 +81,7 @@ in {
           routers = {
             authentik = {
               entryPoints = ["websecure"];
-              rule = "Host(`auth.vlr.chat`) || HostRegexp(`{subdomain:[a-z0-9]+}.vlr.chat`) && PathPrefix(`/outpost.goauthentik.io/`)";
+              rule = "Host(`auth.vlr.chat`) || PathPrefix(`/outpost.goauthentik.io/`)";
               service = "authentik";
               tls = {
                 certResolver = "letsencrypt";
