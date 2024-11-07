@@ -44,7 +44,7 @@ with lib; let
 
 in {
   config = mkIf cfg.enable {
-    systemd.services.vlr-static = {
+    systemd.services.static = {
       description = "VLR Static Site";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
