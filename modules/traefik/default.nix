@@ -66,6 +66,10 @@ in {
                   "X-authentik-meta-app"
                   "X-authentik-meta-version"
                 ];
+                authRequestHeaders = {
+                  "X-Forwarded-Proto" = "https";
+                };
+                authResponseHeadersRegex = "X-.*";
               };
             };
           };
