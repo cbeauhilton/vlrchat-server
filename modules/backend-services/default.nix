@@ -14,7 +14,7 @@ with lib; let
       sha256 = "sha256-3ZqvFmfMZMCEoP7rrtsqWz+s2xKOUTz1SkETlnDuRzk=";
     };
 
-    npmDepsHash = lib.fakeSha256;  # This will fail and give us the real hash
+    npmDepsHash = "";  # This will fail and give us the real hash
 
     buildInputs = with pkgs; [
       nodejs_18
