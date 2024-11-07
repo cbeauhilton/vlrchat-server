@@ -59,18 +59,25 @@ in {
           level = "DEBUG";
         };
 
-        # For development, use static certificates instead of Let's Encrypt
-        tls = {
-          certificates = [{
-            certFile = "/var/lib/traefik/cert.pem";
-            keyFile = "/var/lib/traefik/key.pem";
-          }];
-          options = {
-            default = {
-              insecureSkipVerify = true;  # For development only
-            };
-          };
+        # Let's Encrypt configuration
+        certificatesResolvers.letsencrypt.acme = {
+          email = "beau@beauhilton.com";  # Replace with your email
+          storage = "/var/lib/traefik/acme.json";
+          httpChallenge.entryPoint = "web";
         };
+
+        # # For development, use static certificates instead of Let's Encrypt
+        # tls = {
+        #   certificates = [{
+        #     certFile = "/var/lib/traefik/cert.pem";
+        #     keyFile = "/var/lib/traefik/key.pem";
+        #   }];
+        #   options = {
+        #     default = {
+        #       insecureSkipVerify = true;  # For development only
+        #     };
+        #   };
+        # };
       };
 
       dynamicConfigOptions = {
@@ -120,7 +127,9 @@ in {
               entryPoints = ["websecure"];
               rule = "Host(`auth.vlr.chat`)";
               service = "authentik";
-              tls = {};
+              tls = {
+                certResolver = "letsencrypt";  # Add this line to use Let's Encrypt
+              };
             };
           };
         };
