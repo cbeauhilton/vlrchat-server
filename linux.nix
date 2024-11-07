@@ -109,9 +109,6 @@
     traefik.enable = true;
     backend = {
       enable = true;
-      flowise = {
-        enable = true;
-      };
     };
   };
 }
