@@ -44,9 +44,18 @@ in {
       recommendedOptimisation = true;
       recommendedTlsSettings = true;
 
+      # Add self-signed cert configuration
+      sslCertificate = "/run/secrets/nginx-cert.pem";
+      sslCertificateKey = "/run/secrets/nginx-key.pem";
+
       virtualHosts = {
         "auth.vlr.chat" = {
           serverName = "auth.vlr.chat";
+          forceSSL = true;
+          # Remove enableACME = true;
+          useACMEHost = false;
+          sslCertificate = "/run/secrets/nginx-cert.pem";
+          sslCertificateKey = "/run/secrets/nginx-key.pem";
           extraConfig = ''
             proxy_headers_hash_max_size 512;
             proxy_headers_hash_bucket_size 64;
