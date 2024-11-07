@@ -44,32 +44,33 @@ in {
       recommendedOptimisation = true;
       recommendedTlsSettings = true;
 
-      # Add proxy hash settings to resolve the warning
+      # Basic proxy hash settings
       appendConfig = ''
-        proxy_headers_hash_max_size 1024;
-        proxy_headers_hash_bucket_size 128;
+        proxy_headers_hash_max_size 512;
+        proxy_headers_hash_bucket_size 64;
       '';
 
       virtualHosts = {
         "auth.vlr.chat" = {
           serverName = "auth.vlr.chat";
-          locations."/" = {
-            proxyPass = "http://127.0.0.1:9000";
-            proxyWebsockets = true;
-            extraConfig = ''
-              proxy_http_version 1.1;
-              proxy_buffering off;
-              proxy_set_header Host $http_host;
-              proxy_set_header X-Real-IP $remote_addr;
-              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-              proxy_set_header X-Forwarded-Proto $scheme;
-              proxy_set_header X-Forwarded-Host $http_host;
-              proxy_set_header Upgrade $http_upgrade;
-              proxy_set_header Connection $connection_upgrade;
-              proxy_read_timeout 90s;
-              proxy_connect_timeout 90s;
-              proxy_send_timeout 90s;
-            '';
+          locations = {
+            "/" = {
+              proxyPass = "http://127.0.0.1:9000";
+              extraConfig = ''
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+              '';
+            };
+            "/ws" = {
+              proxyPass = "http://127.0.0.1:9000";
+              proxyWebsockets = true;
+              extraConfig = ''
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "upgrade";
+              '';
+            };
           };
         };
         
