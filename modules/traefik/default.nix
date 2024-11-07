@@ -30,7 +30,7 @@ in {
 
         # Let's Encrypt configuration
         certificatesResolvers.letsencrypt.acme = {
-          email = "beau@beauhilton.com";  # Replace with your email
+          email = "beau@beauhilton.com";
           storage = "/var/lib/traefik/acme.json";
           httpChallenge.entryPoint = "web";
         };
