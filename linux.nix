@@ -99,7 +99,7 @@
   # Add these lines to open HTTP/HTTPS ports
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 80 443 ];
+    allowedTCPPorts = [ 80 443 9000 9443 ];
   };
 
   services.vlr = {

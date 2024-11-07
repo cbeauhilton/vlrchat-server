@@ -33,6 +33,12 @@ in {
             httpChallenge.entryPoint = "web";
           };
         };
+        tls = {
+          certificates = [{
+            certFile = "/var/lib/traefik/cert.pem";
+            keyFile = "/var/lib/traefik/key.pem";
+          }];
+        };
       };
       dynamicConfigOptions = {
         http = {
