@@ -14,9 +14,9 @@ with lib; let
       sha256 = "sha256-3ZqvFmfMZMCEoP7rrtsqWz+s2xKOUTz1SkETlnDuRzk=";
     };
 
-    # Add this section to generate package-lock.json
+    # Use full path to npm binary
     postPatch = ''
-      npm i --package-lock-only
+      ${pkgs.nodejs_18}/bin/npm i --package-lock-only
     '';
 
     npmDepsHash = "";  # This will still fail and give us the real hash
