@@ -26,6 +26,9 @@ in {
             address = ":443";
           };
         };
+        providers = {
+          file.enabled = false;
+        };
         certificatesResolvers.default = {
           acme = {
             email = "beau@beauhilton.com";
