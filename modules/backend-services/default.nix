@@ -21,9 +21,8 @@ with lib; let
 
     npmDepsHash = "";  # This will still fail and give us the real hash
 
-    buildInputs = with pkgs; [
-      nodejs_18
-    ];
+    nativeBuildInputs = with pkgs; [ nodejs_18 ];
+    buildInputs = with pkgs; [ nodejs_18 ];
 
     makeCacheWritable = true;
     npmFlags = [ "--legacy-peer-deps" ];
