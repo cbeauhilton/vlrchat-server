@@ -10,10 +10,6 @@ in {
     services.traefik = {
       enable = true;
       staticConfigOptions = {
-        global = {
-          checkNewVersion = false;
-          sendAnonymousUsage = false;
-        };
         entryPoints = {
           web = {
             address = ":80";
@@ -26,29 +22,29 @@ in {
             address = ":443";
           };
         };
-        providers = {
-          file.enabled = false;
+        
+        log = {
+          level = "DEBUG";
         };
-        certificatesResolvers.default = {
-          acme = {
-            email = "beau@beauhilton.com";
-            storage = "/var/lib/traefik/acme.json";
-            httpChallenge.entryPoint = "web";
+
+        certificatesResolvers = {
+          default = {
+            acme = {
+              email = "beau@beauhilton.com";
+              storage = "/var/lib/traefik/acme.json";
+              httpChallenge.entryPoint = "web";
+            };
           };
         };
-        tls = {
-          certificates = [{
-            certFile = "/var/lib/traefik/cert.pem";
-            keyFile = "/var/lib/traefik/key.pem";
-          }];
-        };
       };
+
       dynamicConfigOptions = {
         http = {
           middlewares = {
-            authentik-forward-auth = {
+            authentik = {
               forwardAuth = {
-                address = "http://127.0.0.1:9000/outpost.goauthentik.io/auth/traefik";
+                address = "https://localhost:9443/outpost.goauthentik.io/auth/traefik";
+                tls.insecureSkipVerify = true;
                 trustForwardHeader = true;
                 authResponseHeaders = [
                   "X-authentik-username"
@@ -61,6 +57,7 @@ in {
                   "X-authentik-meta-outpost"
                   "X-authentik-meta-provider"
                   "X-authentik-meta-app"
+                  "X-authentik-meta-version"
                 ];
               };
             };
@@ -68,26 +65,37 @@ in {
           routers = {
             authentik = {
               rule = "Host(`auth.vlr.chat`)";
-              service = "authentik";
+              service = "auth";
+              entryPoints = ["websecure"];
+              tls = {
+                certResolver = "default";
+              };
+            };
+            authentik-outpost = {
+              rule = "Host(`auth.vlr.chat`) && PathPrefix(`/outpost.goauthentik.io/`)";
+              service = "auth";
               entryPoints = ["websecure"];
               tls = {
                 certResolver = "default";
               };
             };
           };
-          services.authentik.loadBalancer = {
-            servers = [{
-              url = "http://127.0.0.1:9000";
-            }];
-            passHostHeader = true;
+          services = {
+            auth = {
+              loadBalancer = {
+                servers = [{
+                  url = "http://localhost:9000";
+                }];
+                passHostHeader = true;
+              };
+            };
           };
         };
       };
     };
 
-    # Ensure directories exist
-    systemd.tmpfiles.rules = [
-      "d /var/lib/traefik 0750 traefik traefik -"
-    ];
+    systemd.services.traefik.serviceConfig = {
+      StateDirectory = "traefik";
+    };
   };
 }
