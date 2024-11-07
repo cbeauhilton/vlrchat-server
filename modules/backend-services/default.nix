@@ -6,18 +6,18 @@ in {
     enable = mkEnableOption "Enable VLR backend services";
     flowise = {
       enable = mkEnableOption "Enable Flowise AI";
-      credentials = {
-        username = mkOption {
-          type = types.str;
-          default = "admin";
-          description = "Flowise admin username";
-        };
-        password = mkOption {
-          type = types.str;
-          default = "changeme123";
-          description = "Flowise admin password";
-        };
-      };
+    #   credentials = { # using authentik, single flowise user, at least for now
+    #     username = mkOption {
+    #       type = types.str;
+    #       default = "admin";
+    #       description = "Flowise admin username";
+    #     };
+    #     password = mkOption {
+    #       type = types.str;
+    #       default = "changeme123";
+    #       description = "Flowise admin password";
+    #     };
+    #   };
     };
     # We can add more backend services here later
   };
@@ -34,8 +34,8 @@ in {
         image = "flowiseai/flowise:latest";
         ports = [ "3000:3000" ];
         environment = {
-          FLOWISE_USERNAME = cfg.flowise.credentials.username;
-          FLOWISE_PASSWORD = cfg.flowise.credentials.password;
+        #   FLOWISE_USERNAME = cfg.flowise.credentials.username;
+        #   FLOWISE_PASSWORD = cfg.flowise.credentials.password;
           PORT = "3000";
           DISABLE_FLOWISE_TELEMETRY = "true";  # Optional: disable telemetry
         };

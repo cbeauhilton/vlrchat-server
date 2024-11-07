@@ -111,10 +111,6 @@
       enable = true;
       flowise = {
         enable = true;
-        credentials = {
-          username = "changeme";
-          password = "changeme";
-        };
       };
     };
   };
