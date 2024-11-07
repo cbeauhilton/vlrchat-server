@@ -78,11 +78,11 @@ in {
           middlewares = {
             security-headers = {
               headers = {
-                stsSeconds = 31536000
-                stsIncludeSubdomains = true
-                contentTypeNosniff = true
-                xFrameOptions = "DENY"
-                referrerPolicy = "strict-origin-when-cross-origin"
+                stsSeconds = 31536000;
+                stsIncludeSubdomains = true;
+                contentTypeNosniff = true;
+                xFrameOptions = "DENY";
+                referrerPolicy = "strict-origin-when-cross-origin";
               };
             };
             authentik = {
