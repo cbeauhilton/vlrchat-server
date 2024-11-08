@@ -50,7 +50,7 @@ in {
             # };
             authentik = {
               forwardAuth = {
-                address = "https://auth.vlr.chat/outpost.goauthentik.io/auth/traefik";
+                address = "https://auth.vlr.chat/outpost.goauthentik.io/auth/traefik?rd=${url}";
                 tls.insecureSkipVerify = false;
                 trustForwardHeader = true;
                 authResponseHeaders = [
