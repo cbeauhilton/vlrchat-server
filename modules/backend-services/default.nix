@@ -79,13 +79,14 @@ in {
   config = mkIf cfg.enable {
     # Set default values
     services.vlr.backend = {
-      flowise.enable = mkDefault true;
-      static.enable = mkDefault true;
+      flowise = {
+        enable = mkDefault true;
+      };
+      static = {
+        enable = mkDefault true;
+      };
       meilisearch = {
         enable = mkDefault true;
-        extraConfig = {
-          MEILI_MAX_INDEXING_MEMORY = "2 GiB";
-        };
       };
     };
 
