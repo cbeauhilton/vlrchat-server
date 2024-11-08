@@ -2,6 +2,14 @@
 with lib; let
   cfg = config.services.vlr.backend.flowise;
 in {
+  options.services.vlr.backend.flowise = {
+    port = mkOption {
+      type = types.port;
+      default = 3000;
+      description = "Port on which Flowise will listen";
+    };
+  };
+
   config = mkIf cfg.enable {
     virtualisation.oci-containers = {
       backend = "docker";
