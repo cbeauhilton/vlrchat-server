@@ -4,8 +4,6 @@ with lib; let
   cfg = config.services.vlr.backend.meilisearch;
 in {
   options.services.vlr.backend.meilisearch = {
-    enable = mkEnableOption "VLR Meilisearch service";
-
     port = mkOption {
       type = types.port;
       default = 7700;
