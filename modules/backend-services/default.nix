@@ -24,17 +24,9 @@ with lib; let
       enable = cfg.static.enable;
       port = 3001;
     };
-    meilisearch = {
-      enable = true;
+    meilisearch = mkServiceConfig "meilisearch" {
+      enable = cfg.meilisearch.enable;
       port = 7700;
-      experimentalFeatures = {
-        MEILI_EXPERIMENTAL_ENABLE_METRICS = true;
-        MEILI_EXPERIMENTAL_VECTOR_STORE = true;
-      };
-      extraConfig = {
-        MEILI_MAX_INDEXING_MEMORY = "2 GiB";
-        MEILI_LOG_LEVEL = "INFO";
-      };
     };
     # Add new services here following the same pattern
   };
@@ -62,6 +54,7 @@ in {
   imports = [
     ./flowise
     ./static
+    ./meilisearch
   ];
 
   options.services.vlr.backend = {
@@ -77,13 +70,27 @@ in {
       enable = mkEnableOption "Enable static service";
       # Add any static-specific options here
     };
+
+    meilisearch = {
+      enable = true;
+      port = 3000;
+      experimentalFeatures = {
+        MEILI_EXPERIMENTAL_ENABLE_METRICS = true;
+        MEILI_EXPERIMENTAL_VECTOR_STORE = true;
+      };
+      extraConfig = {
+        MEILI_MAX_INDEXING_MEMORY = "2 GiB";
+        MEILI_LOG_LEVEL = "INFO";
+      };
+    };
   };
 
   config = mkIf cfg.enable {
     # Set default values
     services.vlr.backend = {
-      flowise.enable = mkDefault false;
+      flowise.enable = mkDefault true;
       static.enable = mkDefault true;
+      meilisearch.enable = mkDefault true;
     };
 
     # Generate Traefik configuration only for enabled services
