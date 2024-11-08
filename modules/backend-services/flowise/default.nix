@@ -19,10 +19,11 @@ in {
         environment = {
           FLOWISE_USERNAME = "a";
           FLOWISE_PASSWORD = "a";
+          PORT = toString cfg.port;
           # CORS_ORIGINS = "*";
           # IFRAME_ORIGINS = "*";
           DATABASE_PATH = "/root/.flowise/database.sqlite";
-          APIKEY_PATH = "/root/.flowise/apikeys.json";
+          # APIKEY_PATH = "/root/.flowise/apikeys.json";
           SECRETKEY_PATH = "/root/.flowise/secrets.json";
           LOG_PATH = "/root/.flowise/logs";
           BLOB_STORAGE_PATH = "/root/.flowise/storage";
@@ -31,10 +32,7 @@ in {
           "/var/lib/flowise:/root/.flowise"
         ];
         ports = [
-          "${toString cfg.port}:${toString cfg.port}"
-        ];
-        extraOptions = [
-          "--network=host"
+          "${toString cfg.port}:3000"
         ];
       };
     };
