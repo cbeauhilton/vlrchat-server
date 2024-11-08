@@ -17,8 +17,8 @@ in {
         image = "flowiseai/flowise:latest";
         autoStart = true;
         environment = {
-          # FLOWISE_USERNAME = "";
-          # FLOWISE_PASSWORD = "";
+          FLOWISE_USERNAME = "a";
+          FLOWISE_PASSWORD = "a";
           # CORS_ORIGINS = "*";
           # IFRAME_ORIGINS = "*";
           DATABASE_PATH = "/root/.flowise/database.sqlite";
