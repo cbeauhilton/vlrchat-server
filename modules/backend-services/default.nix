@@ -72,8 +72,7 @@ in {
     };
 
     meilisearch = {
-      enable = true;
-      port = 3000;
+      enable = mkEnableOption "Enable Meilisearch service";
       experimentalFeatures = {
         MEILI_EXPERIMENTAL_ENABLE_METRICS = true;
         MEILI_EXPERIMENTAL_VECTOR_STORE = true;
