@@ -9,7 +9,6 @@ in {
         image = "flowiseai/flowise:latest";
         autoStart = true;
         environment = {
-          PORT = toString cfg.port;
           FLOWISE_USERNAME = "";
           FLOWISE_PASSWORD = "";
           CORS_ORIGINS = "*";
