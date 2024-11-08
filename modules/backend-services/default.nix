@@ -24,6 +24,18 @@ with lib; let
       enable = cfg.static.enable;
       port = 3001;
     };
+    meilisearch = {
+      enable = true;
+      port = 7700;
+      experimentalFeatures = {
+        MEILI_EXPERIMENTAL_ENABLE_METRICS = true;
+        MEILI_EXPERIMENTAL_VECTOR_STORE = true;
+      };
+      extraConfig = {
+        MEILI_MAX_INDEXING_MEMORY = "2 GiB";
+        MEILI_LOG_LEVEL = "INFO";
+      };
+    };
     # Add new services here following the same pattern
   };
 
