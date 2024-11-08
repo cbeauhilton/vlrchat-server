@@ -17,10 +17,10 @@ in {
         image = "flowiseai/flowise:latest";
         autoStart = true;
         environment = {
-          FLOWISE_USERNAME = "";
-          FLOWISE_PASSWORD = "";
-          CORS_ORIGINS = "*";
-          IFRAME_ORIGINS = "*";
+          # FLOWISE_USERNAME = "";
+          # FLOWISE_PASSWORD = "";
+          # CORS_ORIGINS = "*";
+          # IFRAME_ORIGINS = "*";
           DATABASE_PATH = "/root/.flowise/database.sqlite";
           APIKEY_PATH = "/root/.flowise/apikeys.json";
           SECRETKEY_PATH = "/root/.flowise/secrets.json";
