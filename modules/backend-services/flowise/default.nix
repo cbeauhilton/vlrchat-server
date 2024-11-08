@@ -10,10 +10,10 @@ in {
         autoStart = true;
         environment = {
           PORT = toString cfg.port;
-          FLOWISE_USERNAME = cfg.username;
-          FLOWISE_PASSWORD = cfg.password;
-          CORS_ORIGINS = cfg.corsOrigins;
-          IFRAME_ORIGINS = cfg.iframeOrigins;
+          FLOWISE_USERNAME = "";
+          FLOWISE_PASSWORD = "";
+          CORS_ORIGINS = "*";
+          IFRAME_ORIGINS = "*";
           DATABASE_PATH = "/root/.flowise/database.sqlite";
           APIKEY_PATH = "/root/.flowise/apikeys.json";
           SECRETKEY_PATH = "/root/.flowise/secrets.json";
