@@ -12,8 +12,8 @@
       
       # Individual services
       static.enable = true;    # Landing page
-      flowise.enable = false;  # AI service
-      # Add new services here
+      flowise.enable = true;  # AI service
+      # serviceName.enable = true;  # Add new services here
     };
   };
 

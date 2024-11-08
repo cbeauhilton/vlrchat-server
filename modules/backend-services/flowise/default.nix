@@ -1,51 +1,69 @@
 { config, lib, pkgs, ... }:
 with lib; let
   cfg = config.services.vlr.backend.flowise;
-  
-  # Create a derivation for Flowise
-  flowise = pkgs.buildNpmPackage {
-    pname = "flowise";
-    version = "2.1.3";
-    
-    src = pkgs.fetchFromGitHub {
-      owner = "FlowiseAI";
-      repo = "Flowise";
-      rev = "flowise@2.1.3";
-      sha256 = "sha256-3ZqvFmfMZMCEoP7rrtsqWz+s2xKOUTz1SkETlnDuRzk=";
+in {
+  options.services.vlr.backend.flowise = {
+    enable = mkEnableOption "Flowise AI service";
+
+    # Add configuration options
+    port = mkOption {
+      type = types.port;
+      default = 3000;
+      description = "Port for Flowise to listen on";
     };
 
-    postPatch = ''
-      ${pkgs.nodejs_18}/bin/npm i --package-lock-only
-    '';
+    username = mkOption {
+      type = types.str;
+      default = "";
+      description = "Flowise admin username, if desired"; # we're using authentik for auth so this isn't strictly necessary
+    };
 
-    npmDepsHash = "";
+    password = mkOption {
+      type = types.str;
+      default = "";
+      description = "Flowise admin password, if desired"; # we're using authentik for auth so this isn't strictly necessary
+    };
 
-    nativeBuildInputs = with pkgs; [ nodejs_18 ];
-    buildInputs = with pkgs; [ nodejs_18 ];
+    corsOrigins = mkOption {
+      type = types.str;
+      default = "*";
+      description = "Allowed CORS origins";
+    };
 
-    makeCacheWritable = true;
-    npmFlags = [ "--legacy-peer-deps" ];
-    npmInstallFlags = [ "--only=production" ];
+    iframeOrigins = mkOption {
+      type = types.str;
+      default = "*";
+      description = "Allowed iframe origins";
+    };
   };
 
-in {
   config = mkIf cfg.enable {
-    systemd.services.flowise = {
-      description = "Flowise AI";
-      after = [ "network.target" ];
-      wantedBy = [ "multi-user.target" ];
-      environment = {
-        PORT = "3000";
-        HOME = "/var/lib/flowise";
-      };
-      serviceConfig = {
-        Type = "simple";
-        User = "flowise";
-        Group = "flowise";
-        ExecStart = "${pkgs.nodejs_18}/bin/node ${flowise}/bin/flowise start";
-        Restart = "always";
-        RestartSec = "10";
-        WorkingDirectory = "/var/lib/flowise";
+    virtualisation.oci-containers = {
+      backend = "docker";
+      containers.flowise = {
+        image = "flowiseai/flowise:latest";
+        autoStart = true;
+        environment = {
+          PORT = toString cfg.port;
+          FLOWISE_USERNAME = cfg.username;
+          FLOWISE_PASSWORD = cfg.password;
+          CORS_ORIGINS = cfg.corsOrigins;
+          IFRAME_ORIGINS = cfg.iframeOrigins;
+          DATABASE_PATH = "/root/.flowise/database.sqlite";
+          APIKEY_PATH = "/root/.flowise/apikeys.json";
+          SECRETKEY_PATH = "/root/.flowise/secrets.json";
+          LOG_PATH = "/root/.flowise/logs";
+          BLOB_STORAGE_PATH = "/root/.flowise/storage";
+        };
+        volumes = [
+          "/var/lib/flowise:/root/.flowise"
+        ];
+        ports = [
+          "${toString cfg.port}:${toString cfg.port}"
+        ];
+        extraOptions = [
+          "--network=host"
+        ];
       };
     };
 
