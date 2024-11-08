@@ -73,14 +73,6 @@ in {
 
     meilisearch = {
       enable = mkEnableOption "Enable Meilisearch service";
-      experimentalFeatures = {
-        MEILI_EXPERIMENTAL_ENABLE_METRICS = true;
-        MEILI_EXPERIMENTAL_VECTOR_STORE = true;
-      };
-      extraConfig = {
-        MEILI_MAX_INDEXING_MEMORY = "2 GiB";
-        MEILI_LOG_LEVEL = "INFO";
-      };
     };
   };
 
@@ -89,7 +81,12 @@ in {
     services.vlr.backend = {
       flowise.enable = mkDefault true;
       static.enable = mkDefault true;
-      meilisearch.enable = mkDefault true;
+      meilisearch = {
+        enable = mkDefault true;
+        extraConfig = {
+          MEILI_MAX_INDEXING_MEMORY = "2 GiB";
+        };
+      };
     };
 
     # Generate Traefik configuration only for enabled services
