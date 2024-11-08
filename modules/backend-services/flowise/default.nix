@@ -31,8 +31,11 @@ in {
         volumes = [
           "/var/lib/flowise:/root/.flowise"
         ];
-        ports = [
-          "${toString cfg.port}:3000"
+        # ports = [
+        #   "${toString cfg.port}:3000"
+        # ];
+        extraOptions = [
+          "--network=host"
         ];
       };
     };
