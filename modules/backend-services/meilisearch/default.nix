@@ -26,20 +26,20 @@ in {
   };
 
   config = mkIf cfg.enable {
+    # Enable the base meilisearch service
     services.meilisearch = {
       enable = true;
       listenAddress = "127.0.0.1";
       listenPort = cfg.port;
       environment = "development";
-      environmentFile = pkgs.writeText "meilisearch-env" (toEnvFormat (
+      environmentVariables = 
         # Set default values here
         {
           MEILI_EXPERIMENTAL_ENABLE_METRICS = "true";
           MEILI_EXPERIMENTAL_VECTOR_STORE = "true";
           MEILI_MAX_INDEXING_MEMORY = "2 GiB";
           MEILI_LOG_LEVEL = "INFO";
-        } // cfg.extraConfig // cfg.experimentalFeatures
-      ));
+        } // cfg.extraConfig;
     };
 
     # Create meilisearch user and group
