@@ -2,41 +2,6 @@
 with lib; let
   cfg = config.services.vlr.backend.flowise;
 in {
-  options.services.vlr.backend.flowise = {
-    enable = mkEnableOption "Flowise AI service";
-
-    # Add configuration options
-    port = mkOption {
-      type = types.port;
-      default = 3000;
-      description = "Port for Flowise to listen on";
-    };
-
-    username = mkOption {
-      type = types.str;
-      default = "";
-      description = "Flowise admin username, if desired"; # we're using authentik for auth so this isn't strictly necessary
-    };
-
-    password = mkOption {
-      type = types.str;
-      default = "";
-      description = "Flowise admin password, if desired"; # we're using authentik for auth so this isn't strictly necessary
-    };
-
-    corsOrigins = mkOption {
-      type = types.str;
-      default = "*";
-      description = "Allowed CORS origins";
-    };
-
-    iframeOrigins = mkOption {
-      type = types.str;
-      default = "*";
-      description = "Allowed iframe origins";
-    };
-  };
-
   config = mkIf cfg.enable {
     virtualisation.oci-containers = {
       backend = "docker";
